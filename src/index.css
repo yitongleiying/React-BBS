@@ -1,7 +1,7 @@
 /* 设置滚动条的样式 */
 ::-webkit-scrollbar {
-  height: 20px;
-  width: 10px;
+  height: 10px;
+  width: 6px;
 }
 /* 两个滚动条交接处 -- x轴和y轴 */
 ::-webkit-scrollbar-corner {
