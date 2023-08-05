@@ -1,7 +1,8 @@
 import Dialog from "../../components/Modal"
 import { Button, Checkbox, Form, Input, Popover, message } from "antd"
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
-import { useSetState } from "ahooks"
+import { forwardRef, useImperativeHandle, useState } from "react"
+import md5 from "js-md5"
+import { useSetState, useCookieState } from "ahooks"
 import styles from "./index.module.scss"
 import verify from "@/utils/Verify.js"
 import Request from "../../utils/Request"
@@ -39,7 +40,10 @@ const LoginAndRegister = forwardRef(function LoginAndRegister(props, ref) {
       )
     }
   }
-
+  // 设置登陆信息的cookie
+  const [loginCookie, setLoginCookie] = useCookieState("loginInfo", {
+    expires: () => new Date()(),
+  })
   // 重置表单验证
   const resetForm = (type) => {
     setDialog(() => ({ show: true }))
@@ -84,18 +88,16 @@ const LoginAndRegister = forwardRef(function LoginAndRegister(props, ref) {
         type: "primary",
         text: "发送验证码",
         click: () => {
-          if (opType === 0) {
+          if ("nickName" in form.getFieldsValue()) {
             sendEmailCode(0)
-          } else if (opType === 2) {
+          } else {
             sendEmailCode(1)
           }
         },
       },
     ],
   })
-  useEffect(() => {
-    console.log("opType的值改变了--opType===", opType)
-  }, [opType])
+
   // 发送邮箱验证码弹框
   const getEmailCode = () => {
     form.validateFields(["email"]).then((vaild) => {
@@ -107,7 +109,6 @@ const LoginAndRegister = forwardRef(function LoginAndRegister(props, ref) {
       changeCheckCode(1)
       setEmail(form.getFieldValue("email"))
       formCode.setFieldValue("email", form.getFieldValue("email"))
-      console.log(opType);
     })
   }
 
@@ -138,6 +139,7 @@ const LoginAndRegister = forwardRef(function LoginAndRegister(props, ref) {
       setDialogConfig4SendMailCode({ show: false })
     })
   }
+
   const doSubmit = () => {
     form.validateFields().then(async (valid) => {
       if (!valid) {
@@ -146,11 +148,19 @@ const LoginAndRegister = forwardRef(function LoginAndRegister(props, ref) {
       let url = null
       let params = {}
       Object.assign(params, form.getFieldsValue())
-      if (opType === 0) {
-        url = api.register
+      if (opType === 0 || opType == 2) {
         params.password = params.registerPassword
         delete params.registerPassword
         delete params.reRegisterPassword
+      }
+      if (opType === 1) {
+        let cookiePassword = loginCookie == null ? null : loginCookie.password
+        if (params.password !== cookiePassword) {
+          params.password = md5(params.password)
+        }
+      }
+      if (opType === 0) {
+        url = api.register
       } else if (opType === 1) {
         url = api.login
       } else if (opType == 2) {
@@ -170,6 +180,19 @@ const LoginAndRegister = forwardRef(function LoginAndRegister(props, ref) {
         message.success("注册成功，请登陆")
         showPanel(1)
       } else if (opType === 1) {
+        const loginInfo = {
+          email: params.email,
+          password: params.password,
+          rememberMe: params.rememberMe,
+        }
+        if (params.rememberMe) {
+          setLoginCookie(loginInfo, {
+            expires: (() => new Date(+new Date() + 604800000))(),
+          })
+        } else {
+          setLoginCookie(loginInfo)
+        }
+        setDialog({ show: false })
         message.success("登陆成功")
       } else if (opType === 2) {
         message.success("重置密码成功，请登陆")
@@ -177,7 +200,6 @@ const LoginAndRegister = forwardRef(function LoginAndRegister(props, ref) {
       }
     })
   }
-
   return (
     <>
       <Dialog
@@ -189,9 +211,7 @@ const LoginAndRegister = forwardRef(function LoginAndRegister(props, ref) {
         <Form
           form={form}
           className={styles["login-register"]}
-          initialValues={{
-            remember: true,
-          }}
+          initialValues={JSON.parse(loginCookie)}
         >
           <Form.Item
             name="email"
@@ -360,9 +380,11 @@ const LoginAndRegister = forwardRef(function LoginAndRegister(props, ref) {
               />
             </div>
           </Form.Item>
-          <Form.Item name="remember" valuePropName="checked" noStyle>
-            <Checkbox>记住我</Checkbox>
-          </Form.Item>
+          {opType == 1 && (
+            <Form.Item name="rememberMe" valuePropName="checked" noStyle>
+              <Checkbox>记住我</Checkbox>
+            </Form.Item>
+          )}
           {opType == 1 && (
             <Form.Item>
               <div className={styles["no-account"]}>
