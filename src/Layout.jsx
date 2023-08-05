@@ -1,9 +1,10 @@
 import { Outlet, Link } from "react-router-dom"
 import { Button } from "antd"
-import Dialog from "./components/Modal"
-import React from "react"
+import LoginAndRegister from "./pages/LoginAndRegister"
+import React, { useRef } from "react"
 import styles from "./Layout.module.scss"
-import { useBoolean, useScroll, useUpdateEffect, useSetState } from "ahooks"
+
+import { useBoolean, useScroll, useUpdateEffect } from "ahooks"
 const logoInfo = [
   {
     letter: "E",
@@ -39,10 +40,10 @@ const getScrollTop = () => {
   return scrollTop
 }
 function Layout() {
+  const { globalInfo } = React
   // 获取浏览器滚动条位置监听滚动往下时是否显示顶部导航栏
   const [showHeader, { setTrue, setFalse }] = useBoolean(true)
   const scroll = useScroll(document)
-
   const initScroll = () => {
     const current = getScrollTop()
     if (scroll.top > 100 && scroll.top < current) {
@@ -59,7 +60,6 @@ function Layout() {
     }
   })
 
-  const { globalInfo } = React
   // 渲染logo标签
   const renderLogo = () =>
     logoInfo.map((item, index) => (
@@ -85,28 +85,19 @@ function Layout() {
       >
         搜索
       </Button>
-      <Button className={styles["op-btn"]} ghost onClick={() => setDialog(() => ({ show: true }))}>
+      <Button className={styles["op-btn"]} ghost onClick={()=>loginAndRegister(1)}>
         登陆
       </Button>
-      <Button className={styles["op-btn"]} ghost onClick={() => setDialog(() => ({ show: true }))}>
+      <Button className={styles["op-btn"]} ghost onClick={()=>loginAndRegister(0)}>
         注册
       </Button>
     </>
   )
-  // 对话框
-  const [dialog, setDialog] = useSetState({
-    show: false,
-    title: "编辑个人信息",
-    buttons: [
-      {
-        type: "primary",
-        text: "确定",
-        click: () => {
-          console.log('123456');
-        },
-      },
-    ],
-  })
+  // 登陆注册对话框
+  const loginAndRegisterRef = useRef(null)
+  const loginAndRegister=(type)=>{
+    loginAndRegisterRef.current.showDialog(type)
+  }
   return (
     <>
       {showHeader && (
@@ -123,18 +114,11 @@ function Layout() {
           </div>
         </div>
       )}
-      <Dialog
-        onClose={() => setDialog(() => ({ show: false }))}
-        show={dialog.show}
-        title={dialog.title}
-        buttons={dialog.buttons}
-        showCancel={true}
-      >
-        <div style={{height:800}}>妹子真好看</div>
-      </Dialog>
+
       <div className={styles["body-content"]}>
         <Outlet />
       </div>
+      <LoginAndRegister ref={loginAndRegisterRef} />
     </>
   )
 }
