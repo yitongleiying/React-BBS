@@ -32,7 +32,7 @@ instance.interceptors.request.use(
     if (error.config.showLoading && loading) {
       hideLoading()
     }
-    message.error("请求发送失败", 2)
+    message.error("请求发送失败")
     return Promise.reject("请求发送失败")
   },
 )

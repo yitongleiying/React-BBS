@@ -1,9 +1,20 @@
 import { Outlet, Link } from "react-router-dom"
-import { Button } from "antd"
-import LoginAndRegister from "./pages/LoginAndRegister"
+import { Button, Popover, Badge } from "antd"
 import React, { useRef } from "react"
+import { useRequest } from "ahooks"
+import { observer } from "mobx-react-lite"
+import useStore from "@/store/index"
 import styles from "./Layout.module.scss"
-
+import Request from "./utils/Request"
+import AvataR from "./components/Avatar"
+import LoginAndRegister from "./pages/LoginAndRegister"
+const api = {
+  getUserInfo: "/getUserInfo",
+  loadBoard: "/board/loadBoard",
+  getMessageCount: "/ucenter/getMessageCount",
+  logout: "/logout",
+  getSysSetting: "/getSysSetting",
+}
 import { useBoolean, useScroll, useUpdateEffect } from "ahooks"
 const logoInfo = [
   {
@@ -39,7 +50,7 @@ const getScrollTop = () => {
   let scrollTop = document.documentElement.scrollTop || document.body.scrollTop
   return scrollTop
 }
-function Layout() {
+const Layout = observer(() => {
   const { globalInfo } = React
   // 获取浏览器滚动条位置监听滚动往下时是否显示顶部导航栏
   const [showHeader, { setTrue, setFalse }] = useBoolean(true)
@@ -52,23 +63,40 @@ function Layout() {
       setTrue()
     }
   }
-
   useUpdateEffect(() => {
     window.addEventListener("scroll", initScroll)
     return () => {
       window.removeEventListener("scroll", initScroll())
     }
   })
-
-  // 渲染logo标签
+  // 登陆注册对话框
+  const loginAndRegisterRef = useRef(null)
+  const loginAndRegister = (type) => {
+    loginAndRegisterRef.current.showDialog(type)
+  }
+  const { userStore } = useStore()
+  const { loginUserInfo, updateLoginUserInfo } = userStore
+  // 获取用户信息
+  const getUserInfo = async () => {
+    let result = await Request({
+      url: api.getUserInfo,
+      showLoading: false,
+    })
+    if (!result) {
+      return
+    }
+    updateLoginUserInfo(result.data)
+  }
+  useRequest(getUserInfo)
+  
   const renderLogo = () =>
     logoInfo.map((item, index) => (
       <span key={index} style={{ color: item.color }}>
         {item.letter}
       </span>
     ))
-  // 渲染板块栏
-  // 渲染按钮组件
+  const avatarRef = useRef()
+  // 渲染按钮组件和头像信息
   const renderButton = () => (
     <>
       <Button
@@ -85,19 +113,58 @@ function Layout() {
       >
         搜索
       </Button>
-      <Button className={styles["op-btn"]} ghost onClick={()=>loginAndRegister(1)}>
-        登陆
-      </Button>
-      <Button className={styles["op-btn"]} ghost onClick={()=>loginAndRegister(0)}>
-        注册
-      </Button>
+
+      {loginUserInfo === null ? (
+        <>
+          <Button className={styles["op-btn"]} ghost onClick={() => loginAndRegister(1)}>
+            登陆
+          </Button>
+          <Button className={styles["op-btn"]} ghost onClick={() => loginAndRegister(0)}>
+            注册
+          </Button>
+        </>
+      ) : (
+        <>
+          <div className={styles["user-info"]}>
+            <Popover
+              content={
+                <>
+                  <p className="message">回复我的</p>
+                  <p className="message">赞了我的文章</p>
+                  <p className="message">下载了我的附件</p>
+                  <p className="message">赞了我的评论</p>
+                  <p className="message">回复我的</p>
+                  <p className="message">系统消息</p>
+                </>
+              }
+              trigger="hover"
+            >
+              <Badge count={5} size="small">
+                <span className="iconfont icon-message"></span>
+              </Badge>
+            </Popover>
+          </div>
+          <div className={styles["message-info"]}>
+            <Popover
+              content={
+                <>
+                  <p className="message">我的主页</p>
+                  <p className="message">退出</p>
+                </>
+              }
+              trigger="hover"
+            >
+              <>
+                <AvataR ref={avatarRef} size={45} userId={loginUserInfo.userId}></AvataR>
+              </>
+            </Popover>
+          </div>
+        </>
+      )}
     </>
   )
-  // 登陆注册对话框
-  const loginAndRegisterRef = useRef(null)
-  const loginAndRegister=(type)=>{
-    loginAndRegisterRef.current.showDialog(type)
-  }
+  // 渲染板块信息
+  // const renderBoard = () => {}
   return (
     <>
       {showHeader && (
@@ -121,6 +188,6 @@ function Layout() {
       <LoginAndRegister ref={loginAndRegisterRef} />
     </>
   )
-}
+})
 
 export default Layout

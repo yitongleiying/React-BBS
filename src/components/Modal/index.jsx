@@ -5,7 +5,7 @@ const Dialog = ({ title, show, width, buttons, children, onClose, showCancel }) 
   return (
     <>
       <Modal
-        // forceRender
+        forceRender
         title={title}
         open={show}
         width={width}
