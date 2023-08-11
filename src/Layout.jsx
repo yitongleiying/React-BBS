@@ -1,6 +1,6 @@
 import { Outlet, Link } from "react-router-dom"
 import { Button, Popover, Badge } from "antd"
-import React, { useRef } from "react"
+import React, { useRef, useEffect } from "react"
 import { useRequest } from "ahooks"
 import { observer } from "mobx-react-lite"
 import useStore from "@/store/index"
@@ -75,7 +75,7 @@ const Layout = observer(() => {
     loginAndRegisterRef.current.showDialog(type)
   }
   const { userStore } = useStore()
-  const { loginUserInfo, updateLoginUserInfo } = userStore
+  const { loginUserInfo, updateLoginUserInfo, showLogin,boardList, saveBoardList } = userStore
   // 获取用户信息
   const getUserInfo = async () => {
     let result = await Request({
@@ -88,7 +88,22 @@ const Layout = observer(() => {
     updateLoginUserInfo(result.data)
   }
   useRequest(getUserInfo)
-  
+  useEffect(()=>{
+    if(showLogin){
+      loginAndRegisterRef.current.showDialog(1)
+    }
+  },[showLogin])
+  // 获取板块信息
+  const loadBoard = async () => {
+    let result = await Request({
+      url: api.loadBoard,
+    })
+    if (!result) {
+      return
+    }
+    saveBoardList(result.data)
+  }
+  useRequest(loadBoard)
   const renderLogo = () =>
     logoInfo.map((item, index) => (
       <span key={index} style={{ color: item.color }}>
@@ -164,7 +179,39 @@ const Layout = observer(() => {
     </>
   )
   // 渲染板块信息
-  // const renderBoard = () => {}
+  const renderBoardList = () => (
+    <>
+      <Link to="/" className={[styles["menu-item"], styles.home].join(" ")}>
+        首页
+      </Link>
+      {boardList.map((board) =>
+        board.children ? (
+          <Popover
+            key={board.boardId}
+            placement="bottomLeft"
+            content={
+              <div className={styles["sub-board-list"]}>
+                {board.children.map((subBoard) => (
+                  <span key={subBoard.boardId} className={styles["sub-board"]}>
+                    {subBoard.boardName}
+                  </span>
+                ))}
+              </div>
+            }
+            trigger="hover"
+          >
+            <>
+              <span className={styles["menu-item"]}>{board.boardName}</span>
+            </>
+          </Popover>
+        ) : (
+          <span key={board.boardId} className={styles["menu-item"]}>
+            {board.boardName}
+          </span>
+        ),
+      )}
+    </>
+  )
   return (
     <>
       {showHeader && (
@@ -173,7 +220,10 @@ const Layout = observer(() => {
             <Link to="/" className={styles.logo}>
               {renderLogo()}
             </Link>
-            <div className={styles["menu-panel"]}></div>
+            <div className={styles["menu-panel"]}>
+              {/* 渲染板块信息 */}
+              {renderBoardList()}
+            </div>
             <div className={styles["user-info-panel"]}>
               {/* 右侧登陆按钮组 */}
               {renderButton()}

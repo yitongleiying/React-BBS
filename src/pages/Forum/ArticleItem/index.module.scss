@@ -1,0 +1,88 @@
+.article-item {
+  background-color: #fff;
+  padding: 5px 15px 0 15px;
+
+  .article-item-inner {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+    display: flex;
+
+    .article-body {
+      flex: 1;
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+
+        .link-info {
+          margin-left: 5px;
+          color: #494949;
+          text-decoration: none;
+
+          &:hover {
+            color: var(--link);
+          }
+        }
+
+        .post-item {
+          font-size: 13px;
+          color: #9a9a9a;
+        }
+      }
+
+      .title-info {
+        font-size: 16px;
+        margin: 10px 0;
+        display: inline-block;
+        text-decoration: none;
+
+        .top {
+          font-weight: bold;
+          font-size: 12px;
+          border-radius: 5px;
+          padding: 2px 5px;
+          border: 1px solid var(--pink);
+          color: var(--pink);
+          margin-right: 10px;
+        }
+
+        .title {
+          color: #4a4a4a;
+          font-weight: bold;
+
+        }
+      }
+
+      .summary {
+        font-size: 14px;
+        color: #86909c;
+      }
+
+      .article-info {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+
+        .iconfont {
+          color: #86909c;
+          margin-right: 25px;
+          font-size: 14px;
+
+          &:before {
+            padding-right: 3px;
+          }
+        }
+        .edit-btn{
+          cursor: pointer;
+          color: var(--link);
+        }
+      }
+    }
+  }
+
+  &:hover {
+    background-color: #f1f0f0;
+  }
+}

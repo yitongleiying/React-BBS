@@ -25,6 +25,7 @@ body {
   background: rgb(243,243,243);
   padding: 0;
   margin: 0;
+  font-size: 14px;
 }
 p{
   margin: 0;
@@ -33,6 +34,9 @@ p{
 :root{
   --link:#409eff;
   --pink:rgb(255,137,176)
+}
+.container-body{
+  margin: 10px auto;
 }
 .loading {
   position: absolute;
@@ -50,12 +54,32 @@ p{
 .iconfont{
   cursor: pointer;
 }
-.icon-message {
+.icon-message{
   font-size: 20px;
   color: rgb(147, 147, 147);
 }
-
 .message{
   cursor: pointer;
   padding: 5px 0;
+}
+.icon-good,.icon-eye-solid, .icon-comment{
+  color: #86909c;
+  margin-right: 25px;
+  font-size: 14px;
+
+  &:before {
+    padding-right: 3px;
+  }
+}
+.tag{
+  font-size: 12px;
+  border-radius: 3px;
+  padding: 0 5px;
+  margin-left: 5px;
+  font-weight: normal;
+}
+.tag-no-audit{
+  color: #d1cbcb;
+  margin-right: 10px;
+  border: 1px solid #d1cbcb;
 }

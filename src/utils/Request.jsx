@@ -1,6 +1,8 @@
 import axios from "axios"
 import { Spin, message } from "antd"
 import ReactDOM from "react-dom/client"
+// import { observer } from "mobx-react-lite"
+import useStore from "@/store/index"
 
 const contentTypeForm = "application/x-www-form-urlencoded;charset=UTF-8"
 const contentTypeJson = "application/json"
@@ -46,6 +48,10 @@ instance.interceptors.response.use(
     if (responseData.code === 200) {
       return responseData
     } else if (responseData.code === 901) {
+      const { userStore } = useStore()
+      const { updateLoginUserInfo, isShowLogin } = userStore
+      isShowLogin(true)
+      updateLoginUserInfo(null)
       return Promise.reject({ showError: false, msg: "登陆超时" })
     } else {
       if (errorCallback) {

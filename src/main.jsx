@@ -2,8 +2,9 @@ import React from "react"
 import ReactDOM from "react-dom/client"
 import zhCN from "antd/locale/zh_CN"
 import { ConfigProvider } from "antd"
-import "./index.css"
+
 import "@/assets/icon/iconfont.css"
+import "./index.scss"
 import router from "./router/index.jsx"
 import { RouterProvider } from "react-router-dom"
 React.globalInfo = {

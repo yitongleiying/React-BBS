@@ -1,0 +1,51 @@
+.article-list-body {
+  .sub-board {
+    padding: 10px;
+    background-color: rgb(243, 243, 243);
+    // box-sizing: content-box;
+
+    .board-item {
+      display: inline-block;
+      background-color: #fff;
+      border-radius: 15px;
+      padding: 2px 10px;
+      margin-right: 10px;
+      color: #909090;
+      cursor: pointer;
+      font-size: 14px;
+
+      a {
+        text-decoration: none;
+        color: #909090;
+      }
+    }
+
+    .active {
+      background-color: var(--link);
+
+      a {
+        color: #fff;
+      }
+    }
+  }
+
+  .article-panel {
+    background-color: #fff;
+
+    .top-tab {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+
+      .tab {
+        cursor: pointer;
+      }
+
+      .active {
+        color: var(--link);
+      }
+    }
+  }
+
+}

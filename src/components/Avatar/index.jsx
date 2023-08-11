@@ -20,7 +20,7 @@ const AvataR = forwardRef(function AvataR({ size, addLink, userId }, ref) {
   )
 })
 AvataR.defaultProps = {
-  size: 60,
+  size: 40,
 }
 AvataR.propTypes = {
   size: PropTypes.number,
